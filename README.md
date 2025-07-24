@@ -2,7 +2,7 @@
 
 A comprehensive React.js application for managing waypoints on ROS2 occupancy maps, designed specifically for robotic navigation systems. This tool allows you to visually place, edit, and manage navigation waypoints on your robot's occupancy grid maps.
 
-![Application Screenshot](https://via.placeholder.com/800x400/667eea/ffffff?text=Xavier+Waypoint+Manager)
+![Application Screenshot](image.png)
 
 ## 🚀 Features
 
