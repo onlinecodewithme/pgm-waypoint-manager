@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Xavier Waypoint Manager Backend
+Waypoint Manager Backend
 Flask API for managing waypoints and interfacing with ROS2
 """
 

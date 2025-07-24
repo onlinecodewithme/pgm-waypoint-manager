@@ -27,7 +27,7 @@ function App() {
   return (
     <div className="App">
       <div className="app-header">
-        <h1>Xavier Occupancy Map Waypoint Manager</h1>
+        <h1>Occupancy Map Waypoint Manager</h1>
         <p>ROS2 Compatible Waypoint Management System</p>
       </div>
       
