@@ -1,23 +1,53 @@
-import logo from './logo.svg';
+import React, { useState, useCallback } from 'react';
+import MapViewer from './components/MapViewer';
+import WaypointPanel from './components/WaypointPanel';
 import './App.css';
 
 function App() {
+  const [waypoints, setWaypoints] = useState([]);
+
+  const handleWaypointAdd = useCallback((waypoint) => {
+    setWaypoints(prev => [...prev, waypoint]);
+  }, []);
+
+  const handleWaypointRemove = useCallback((waypointId) => {
+    setWaypoints(prev => prev.filter(wp => wp.id !== waypointId));
+  }, []);
+
+  const handleWaypointUpdate = useCallback((updatedWaypoint) => {
+    setWaypoints(prev => 
+      prev.map(wp => wp.id === updatedWaypoint.id ? updatedWaypoint : wp)
+    );
+  }, []);
+
+  const handleLoadWaypoints = useCallback((loadedWaypoints) => {
+    setWaypoints(loadedWaypoints);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="app-header">
+        <h1>Xavier Occupancy Map Waypoint Manager</h1>
+        <p>ROS2 Compatible Waypoint Management System</p>
+      </div>
+      
+      <div className="app-content">
+        <div className="map-container">
+          <MapViewer
+            waypoints={waypoints}
+            onWaypointAdd={handleWaypointAdd}
+            onWaypointRemove={handleWaypointRemove}
+            onWaypointUpdate={handleWaypointUpdate}
+          />
+        </div>
+        
+        <WaypointPanel
+          waypoints={waypoints}
+          onWaypointUpdate={handleWaypointUpdate}
+          onWaypointRemove={handleWaypointRemove}
+          onLoadWaypoints={handleLoadWaypoints}
+        />
+      </div>
     </div>
   );
 }

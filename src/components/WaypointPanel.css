@@ -1,0 +1,259 @@
+.waypoint-panel {
+  width: 350px;
+  height: 100vh;
+  background-color: white;
+  border-left: 1px solid #ddd;
+  padding: 20px;
+  overflow-y: auto;
+  box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+}
+
+.panel-header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 15px;
+}
+
+.panel-header h2 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.export-btn, .import-btn {
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.export-btn:hover, .import-btn:hover {
+  background-color: #218838;
+}
+
+.import-btn {
+  background-color: #17a2b8;
+}
+
+.import-btn:hover {
+  background-color: #138496;
+}
+
+.waypoint-list {
+  margin-bottom: 30px;
+}
+
+.waypoint-list h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.no-waypoints {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.waypoint-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.waypoint-item {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f8f9fa;
+}
+
+.waypoint-item:hover {
+  border-color: #007bff;
+  background-color: #e3f2fd;
+}
+
+.waypoint-item.selected {
+  border-color: #007bff;
+  background-color: #e3f2fd;
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+}
+
+.waypoint-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.waypoint-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #333;
+  flex-shrink: 0;
+}
+
+.waypoint-name {
+  flex-grow: 1;
+  font-weight: bold;
+  color: #333;
+}
+
+.remove-btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: #c82333;
+}
+
+.waypoint-coords {
+  font-size: 12px;
+  color: #6c757d;
+  font-family: 'Courier New', monospace;
+}
+
+.waypoint-editor {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  border: 1px solid #ddd;
+}
+
+.waypoint-editor h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.editor-field {
+  margin-bottom: 15px;
+}
+
+.editor-field label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+.editor-field input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.editor-field input[type="color"] {
+  width: 50px;
+  height: 35px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.position-display {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  color: #495057;
+  background-color: white;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.editor-actions {
+  margin-top: 20px;
+}
+
+.update-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.update-btn:hover {
+  background-color: #0056b3;
+}
+
+.instructions {
+  background-color: #e9ecef;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.instructions h3 {
+  margin: 0 0 10px 0;
+  color: #495057;
+  font-size: 16px;
+}
+
+.instructions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.instructions li {
+  margin: 8px 0;
+  color: #6c757d;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Scrollbar styling */
+.waypoint-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.waypoint-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.waypoint-panel::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.waypoint-panel::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
