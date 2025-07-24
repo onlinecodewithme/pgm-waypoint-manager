@@ -19,22 +19,47 @@ const MapViewer = ({ mapData, waypoints, onWaypointAdd, onWaypointRemove, onWayp
         
         // Simple YAML parser for our specific format
         const metadata = {};
-        yamlText.split('\n').forEach(line => {
+        const lines = yamlText.split('\n');
+        let i = 0;
+        
+        while (i < lines.length) {
+          const line = lines[i].trim();
+          if (!line || line.startsWith('#')) {
+            i++;
+            continue;
+          }
+          
           const [key, value] = line.split(':').map(s => s.trim());
-          if (key && value) {
+          
+          if (key && value !== undefined) {
             if (key === 'resolution' || key === 'occupied_thresh' || key === 'free_thresh') {
               metadata[key] = parseFloat(value);
-            } else if (key === 'origin') {
-              // Parse origin array [x, y, theta]
-              const originStr = value.replace(/[[\]]/g, '');
-              metadata[key] = originStr.split(',').map(v => parseFloat(v.trim()));
             } else if (key === 'negate') {
               metadata[key] = parseInt(value);
+            } else if (key === 'origin') {
+              // Handle YAML array format for origin
+              if (value === '') {
+                // Multi-line array format
+                const originArray = [];
+                i++;
+                while (i < lines.length && lines[i].startsWith('-')) {
+                  const arrayValue = lines[i].trim().substring(1).trim();
+                  originArray.push(parseFloat(arrayValue));
+                  i++;
+                }
+                metadata[key] = originArray;
+                i--; // Adjust for the outer loop increment
+              } else {
+                // Single line array format [x, y, theta]
+                const originStr = value.replace(/[[\]]/g, '');
+                metadata[key] = originStr.split(',').map(v => parseFloat(v.trim()));
+              }
             } else {
               metadata[key] = value;
             }
           }
-        });
+          i++;
+        }
         
         setMapMetadata(metadata);
       } catch (error) {
@@ -49,50 +74,78 @@ const MapViewer = ({ mapData, waypoints, onWaypointAdd, onWaypointRemove, onWayp
   useEffect(() => {
     const loadMapImage = async () => {
       try {
-        // For now, we'll create a canvas representation of the PGM data
-        // In a real application, you might want to convert PGM to PNG server-side
-        const canvas = document.createElement('canvas');
-        canvas.width = 400;
-        canvas.height = 300;
-        const ctx = canvas.getContext('2d');
-        
-        // Create a simple representation (you would load actual PGM data here)
-        const imageData = ctx.createImageData(400, 300);
-        
-        // Simulate occupancy grid colors
-        for (let i = 0; i < imageData.data.length; i += 4) {
-          const pixelIndex = i / 4;
-          const x = pixelIndex % 400;
-          const y = Math.floor(pixelIndex / 400);
+        // Load the actual PGM file
+        try {
+          const response = await fetch('/sample-map.pgm');
+          const arrayBuffer = await response.arrayBuffer();
+          const uint8Array = new Uint8Array(arrayBuffer);
           
-          // Simple pattern to simulate the occupancy grid
-          let value = 255; // Free space (white)
-          
-          // Walls (black)
-          if (y < 5 || y > 295 || x < 5 || x > 395) value = 0;
-          if ((x >= 75 && x <= 80 && y >= 50 && y <= 150) ||
-              (y >= 75 && y <= 80 && x >= 75 && x <= 150) ||
-              (x >= 200 && x <= 205 && y >= 25 && y <= 125) ||
-              (x >= 100 && x <= 140 && y >= 180 && y <= 220) ||
-              (x >= 250 && x <= 280 && y >= 250 && y <= 280)) {
-            value = 0;
+          // Parse PGM header
+          let headerEnd = 0;
+          let headerStr = '';
+          for (let i = 0; i < uint8Array.length; i++) {
+            headerStr += String.fromCharCode(uint8Array[i]);
+            if (headerStr.includes('\n255\n')) {
+              headerEnd = i + 1;
+              break;
+            }
           }
           
-          // Unknown areas (gray)
-          if ((x >= 30 && x <= 60 && y >= 30 && y <= 60) ||
-              (x >= 300 && x <= 330 && y >= 200 && y <= 230) ||
-              (x >= 180 && x <= 210 && y >= 120 && y <= 150)) {
-            value = 128;
+          // Extract image data
+          const imageData = uint8Array.slice(headerEnd);
+          
+          // Create canvas with the actual map dimensions
+          const canvas = document.createElement('canvas');
+          canvas.width = 800;
+          canvas.height = 600;
+          const ctx = canvas.getContext('2d');
+          
+          // Create ImageData from PGM data
+          const canvasImageData = ctx.createImageData(800, 600);
+          
+          for (let i = 0; i < imageData.length; i++) {
+            const pixelValue = imageData[i];
+            const canvasIndex = i * 4;
+            
+            canvasImageData.data[canvasIndex] = pixelValue;     // Red
+            canvasImageData.data[canvasIndex + 1] = pixelValue; // Green
+            canvasImageData.data[canvasIndex + 2] = pixelValue; // Blue
+            canvasImageData.data[canvasIndex + 3] = 255;        // Alpha
           }
           
-          imageData.data[i] = value;     // Red
-          imageData.data[i + 1] = value; // Green
-          imageData.data[i + 2] = value; // Blue
-          imageData.data[i + 3] = 255;   // Alpha
+          ctx.putImageData(canvasImageData, 0, 0);
+          setMapImage(canvas);
+        } catch (error) {
+          console.error('Error loading PGM file, using fallback:', error);
+          
+          // Fallback to simple representation
+          const canvas = document.createElement('canvas');
+          canvas.width = 800;
+          canvas.height = 600;
+          const ctx = canvas.getContext('2d');
+          
+          const imageData = ctx.createImageData(800, 600);
+          
+          // Simple fallback pattern
+          for (let i = 0; i < imageData.data.length; i += 4) {
+            const pixelIndex = i / 4;
+            const x = pixelIndex % 800;
+            const y = Math.floor(pixelIndex / 800);
+            
+            let value = 255; // Free space (white)
+            
+            // Basic walls
+            if (y < 8 || y > 592 || x < 8 || x > 792) value = 0;
+            
+            imageData.data[i] = value;
+            imageData.data[i + 1] = value;
+            imageData.data[i + 2] = value;
+            imageData.data[i + 3] = 255;
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+          setMapImage(canvas);
         }
-        
-        ctx.putImageData(imageData, 0, 0);
-        setMapImage(canvas);
       } catch (error) {
         console.error('Error loading map image:', error);
       }
@@ -103,20 +156,24 @@ const MapViewer = ({ mapData, waypoints, onWaypointAdd, onWaypointRemove, onWayp
 
   // Convert pixel coordinates to world coordinates
   const pixelToWorld = useCallback((pixelX, pixelY) => {
-    if (!mapMetadata) return { x: 0, y: 0 };
+    if (!mapMetadata || !mapMetadata.origin || !mapMetadata.resolution) {
+      return { x: 0, y: 0 };
+    }
     
     const worldX = mapMetadata.origin[0] + (pixelX * mapMetadata.resolution);
-    const worldY = mapMetadata.origin[1] + ((300 - pixelY) * mapMetadata.resolution); // Flip Y axis
+    const worldY = mapMetadata.origin[1] + ((600 - pixelY) * mapMetadata.resolution); // Flip Y axis
     
     return { x: worldX, y: worldY };
   }, [mapMetadata]);
 
   // Convert world coordinates to pixel coordinates
   const worldToPixel = useCallback((worldX, worldY) => {
-    if (!mapMetadata) return { x: 0, y: 0 };
+    if (!mapMetadata || !mapMetadata.origin || !mapMetadata.resolution) {
+      return { x: 0, y: 0 };
+    }
     
     const pixelX = (worldX - mapMetadata.origin[0]) / mapMetadata.resolution;
-    const pixelY = 300 - ((worldY - mapMetadata.origin[1]) / mapMetadata.resolution); // Flip Y axis
+    const pixelY = 600 - ((worldY - mapMetadata.origin[1]) / mapMetadata.resolution); // Flip Y axis
     
     return { x: pixelX, y: pixelY };
   }, [mapMetadata]);
